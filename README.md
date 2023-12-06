@@ -21,5 +21,7 @@ Add a database and run the migrations and seeders
 
 You can login with ```bogdan@test.com``` and ```password```
 
+```` ![Converter form](https://raw.github.com/maxi032/currencyconv/master/public/assets/img/s1.png) ````
+
 
 
