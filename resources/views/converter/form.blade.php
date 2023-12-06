@@ -190,7 +190,7 @@
                         tooltip: {
                             formatter: function() {
                                 return 'Date: <strong>' + Highcharts.dateFormat('%d-%m-%Y', this.x) + '</strong><br>' +
-                                    'Exchange rate: <strong>' + this.y.toFixed(2) + '</strong>';
+                                    'Exchange rate: <strong>' + this.y.toFixed(5) + '</strong>';
                             }
                         },
                         series: [{
