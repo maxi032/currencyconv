@@ -171,7 +171,7 @@
 
                     Highcharts.chart('chart', {
                         chart: {
-                            type: 'line'
+                            type: 'spline'
                         },
                         title: {
                             text: fromCurrency + '/' + toCurrency + ' Historical Data for the last 2 months.'
@@ -185,6 +185,18 @@
                         yAxis: {
                             title: {
                                 text: 'Exchange Rate'
+                            }
+                        },
+                        plotOptions: {
+                            series: {
+                                marker: {
+                                    symbol: 'circle',
+                                    fillColor: '#FFFFFF',
+                                    enabled: true,
+                                    radius: 2.5,
+                                    lineWidth: 1,
+                                    lineColor: '#f6452b',
+                                }
                             }
                         },
                         tooltip: {
