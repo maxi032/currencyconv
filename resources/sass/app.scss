@@ -1,0 +1,33 @@
+// Fonts
+@import '/node_modules/@fortawesome/fontawesome-free/css/all.min.css';
+@import url('https://fonts.bunny.net/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import 'bootstrap/scss/bootstrap';
+
+body{
+    height: 100vh;
+}
+
+.btn-semi-left {
+    border-radius: 50px 0 0 50px;
+}
+.btn-semi-right {
+    border-radius: 0 50px 50px 0;
+}
+
+.bleu1{
+    background: linear-gradient(to bottom, #eee, #d9e9f9);
+}
+
+.bleu2{
+    background: linear-gradient(to bottom, #eee, #bac8d3);
+}
+
+.blue3{
+    background-color: #cadae7;
+    min-height:50px;
+}
