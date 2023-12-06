@@ -208,7 +208,7 @@
 
         $(document).ready(function () {
             let typingTimer; // add timeout to be able to convert only after the user has finished typing.
-            let doneTypingInterval = 1000; // 1 second
+            const doneTypingInterval = 1000; // 1 second
 
             $("#btnLeft").on("click", function (e) {
                 e.preventDefault();
