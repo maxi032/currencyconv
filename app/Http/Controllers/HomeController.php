@@ -15,7 +15,6 @@ use ReflectionException;
 
 class HomeController extends Controller
 {
-
     private array $serviceInstances = [];
 
     /**
@@ -53,7 +52,14 @@ class HomeController extends Controller
         ]);
     }
 
-
+    /**
+     * Store provider name in session
+     *
+     * @param $param
+     * @return void
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
     public function setProviderSessionVar($param = null): void
     {
         // Check if the session variable is already set
@@ -66,7 +72,6 @@ class HomeController extends Controller
             session::put('provider', request()->get('value'));
         }
     }
-
 
     /**
      * Make a new conversion with post variables $from $to $amount
@@ -171,14 +176,12 @@ class HomeController extends Controller
                 }
             }
 
-
             if($to) { // do the verifycation only if $to is set
                 if (!property_exists($currency, 'code') && strtoupper($currency->code) === strtoupper($to)) {
                     $toExists = false;
                 }
             }
         }
-
 
         return ($fromExists && $toExists &&  strlen($preparedCurrencies->first()->code) === 3) ? json_encode(['currencies'=>$preparedCurrencies, 'selected_from'=>$from, 'selected_to'=>$to]):json_encode(['error'=>'Code mismatch between the new currencies and the selected currencies']);
     }
@@ -213,5 +216,4 @@ class HomeController extends Controller
             abort(500, 'Internal Server Error');
         }
     }
-
 }
