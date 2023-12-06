@@ -19,7 +19,7 @@ Add a database and run the migrations and seeders
 
 ```npm install && npm run build```
 
-You can login with bogdan@test.com
+You can login with ```bogdan@test.com``` and ```password```
 
 
 
