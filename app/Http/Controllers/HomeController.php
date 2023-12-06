@@ -148,6 +148,41 @@ class HomeController extends Controller
     }
 
     /**
+     * Call the history endpoint of the service
+     *
+     * @param Request $request
+     * @return array|string[]
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    public function getHistoryRates(Request $request){
+        $from = $request->input('from');
+        $to = $request->input('to');
+        $providerName = session()->get('provider');
+        $endDate = date('Y-m-d', strtotime(now()));
+        $startDate = date('Y-m-d', strtotime("2 months ago"));
+        switch ($providerName) {
+            case ProvidersEnum::CURRENCYLAYER->value:
+            case ProvidersEnum::EXCHANGERATEHOST->value:
+
+            // this will take the instance from array if it is already set.
+            $providerService =  $this->instantiateServiceProvider($providerName);
+
+            // Get provider from database
+            $provider = $providerService->getProviderByName($providerName);
+            $endpoints = $provider->endpoints;
+            if(!$endpoints->historical_endpoint_url)
+                return ['message'=>'This provider does not offer access to a historical endpoint'];
+            $endpoint = str_replace(['{start_date}','{end_date}', '{from_currency}', '{to_currency}'], [$startDate, $endDate, $from, $to], $endpoints->historical_endpoint_url);
+            $historicalResult = $providerService->getResponseFromEndpoint($endpoint);
+         break;
+        }
+
+        return (isset($historicalResult['success'])) ?
+            ['result' => $historicalResult['data']['quotes'], 'start_date' => $startDate, 'end_date' => $endDate] : ['error' => $historicalResult['error'], 'statusCode' => $historicalResult['statusCode']];
+    }
+
+    /**
      * When a provider is changed, refresh the currency dropdowns with ajax accordingly and keep the selected options
      *
      */
@@ -170,13 +205,13 @@ class HomeController extends Controller
         $fromExists = $toExists = true;
 
         foreach($preparedCurrencies as $currencyk => $currency){
-            if($from) { // do the verifycation only if $from is set
+            if($from) { // do the verification only if $from is set
                 if (!property_exists($currency, 'code') && strtoupper($currency->code) === strtoupper($from)) {
                     $fromExists = false;
                 }
             }
 
-            if($to) { // do the verifycation only if $to is set
+            if($to) { // do the verification only if $to is set
                 if (!property_exists($currency, 'code') && strtoupper($currency->code) === strtoupper($to)) {
                     $toExists = false;
                 }

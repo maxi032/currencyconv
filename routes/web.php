@@ -24,3 +24,4 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::post('/set-provider', [App\Http\Controllers\HomeController::class, 'setProviderSessionVar'])->name('set-provider-session');
 Route::post('/new-conversion', [App\Http\Controllers\HomeController::class, 'newConversion'])->name('new-conversion');
 Route::post('/refresh-currencies-dropdowns', [App\Http\Controllers\HomeController::class, 'refreshCurrenciesDropdowns'])->name('refresh-currencies');
+Route::post('/get-history-rates', [App\Http\Controllers\HomeController::class, 'getHistoryRates'])->name('getHistoryRates');

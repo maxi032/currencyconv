@@ -35,5 +35,10 @@
             </div>
         </div>
     </div>
+    <div class="row justify-content-center">
+        <div class="col-md-10" id="chart">
+
+        </div>
+    </div>
 </div>
 @endsection

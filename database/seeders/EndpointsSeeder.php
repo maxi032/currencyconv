@@ -29,7 +29,7 @@ class EndpointsSeeder extends Seeder
                     'provider_id'                   => $provider->id,
                     'conversion_endpoint_url'       => 'http://api.currencylayer.com/convert?from={from_currency}&to={to_currency}&amount={amount}&access_key={access_key}',
                     'currency_symbols_endpoint_url' => 'http://api.currencylayer.com/list?access_key={access_key}',
-                    'historical_endpoint_url'       => 'http://api.currencylayer.com/historical?date={date}&access_key={access_key}',
+                    'historical_endpoint_url'       => 'http://api.currencylayer.com/timeframe?source={from_currency}&access_key={access_key}&currencies={to_currency}&start_date={start_date}&end_date={end_date}',
                     'created_at'                    => now()
                 ]);
             } else {
@@ -37,7 +37,7 @@ class EndpointsSeeder extends Seeder
                     'provider_id'                   => $provider->id,
                     'currency_symbols_endpoint_url' => 'http://api.exchangerate.host/list?access_key={access_key}',
                     'conversion_endpoint_url'       => 'http://api.exchangerate.host/convert?from={from_currency}&to={to_currency}&amount={amount}&access_key={access_key}',
-                    'historical_endpoint_url'       => 'http://api.exchangerate.host/convert?access_key={access_key}&from={from_currency}&to={to_currency}&amount={amount}&date={date}',
+                    'historical_endpoint_url'       => 'http://api.exchangerate.host/timeframe?source={from_currency}&access_key={access_key}&currencies={to_currency}&start_date={start_date}&end_date={end_date}',
                     'created_at'                    => now()
                 ]);
             }
