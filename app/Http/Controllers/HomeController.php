@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ConversionPostRequest;
 use App\Services\ConversionService;
 use \App\Enums\ProvidersEnum;
 use App\Services\ExchangeRateAPIConversionService;
@@ -11,6 +12,8 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 
 class HomeController extends Controller
@@ -76,12 +79,12 @@ class HomeController extends Controller
     /**
      * Make a new conversion with post variables $from $to $amount
      *
-     * @param Request $request
+     * @param ConversionPostRequest $request
      * @return mixed
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function newConversion(Request $request): mixed
+    public function newConversion(ConversionPostRequest $request): mixed
     {
         $from = $request->input('from');
         $to = $request->input('to');
@@ -176,6 +179,8 @@ class HomeController extends Controller
             $endpoint = str_replace(['{start_date}','{end_date}', '{from_currency}', '{to_currency}'], [$startDate, $endDate, $from, $to], $endpoints->historical_endpoint_url);
             $historicalResult = $providerService->getResponseFromEndpoint($endpoint);
          break;
+            default:
+                return ['message'=>'This provider does not offer access to a historical endpoint'];
         }
 
         return (isset($historicalResult['success'])) ?

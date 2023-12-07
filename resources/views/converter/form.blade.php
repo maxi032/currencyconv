@@ -45,7 +45,7 @@
         </div>
         <div class="col-6">
             <label for="from_amount" class="form-label">Amount</label>
-            <input name="from_amount" type="text" class="form-control" id="from_amount">
+            <input name="amount" type="text" class="form-control" id="from_amount" disabled="disabled">
         </div>
         <div class="col-6">
             <label for="to_amount" class="form-label">Amount</label>
@@ -83,8 +83,10 @@
             from.html(tempToOptions).prop('selectedIndex', temp2index);
             to.html(tempFromOptions).prop('selectedIndex', temp1index);
 
-            newConversion();
-            refreshChart();
+            if (temp1index > 0 && temp2index > 0 && $('#from_amount').val() > 0) {
+                newConversion();
+                refreshChart();
+            }
         }
 
         /**
@@ -108,7 +110,7 @@
                     console.log(response.result, response.parity, response.parity2, response.conversionDate);
                     if (typeof response.result !== 'undefined') {
                         $("#from_amount").removeClass('is-invalid');
-                        $('#amount_error').remove();
+                        $("[id^='amount_error']").remove();
                         let amount = parseFloat(response.result).toFixed(2);
                         let conversionDate = response.conversionDate;
                         let parity = parseFloat(response.parity).toFixed(4);
@@ -121,7 +123,7 @@
 
                         $('#parityFrom').html('<span class="fw-bold">' + parityFrom.val() + '/' + parityTo.val() + '&nbsp;&nbsp;&nbsp;&nbsp;' + parity + '</span> on ' + conversionDate);
                         $('#parityTo').html('<span class="fw-bold">' + parityTo.val() + '/' + parityFrom.val() + '&nbsp;&nbsp;&nbsp;&nbsp;' + parity2 + ' </span> on ' + conversionDate);
-
+                        refreshChart();
                     } else {
                         // it came back with an error
                         let htmlTagRegex = /<\/?[^>]+(>|$)/g;
@@ -133,13 +135,22 @@
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.log("Err");
-                    console.log(jqXHR, textStatus, errorThrown)
+                    console.log(jqXHR.responseJSON);
+                    let errArr = jqXHR.responseJSON.errors;
+                    $.each(errArr, function (index, value) {
+                        $('input[name="' + index + '"]').addClass('is-invalid');
+                        $.each(value, function (messageIndex, messageText) {
+                            $('input[name="' + index + '"]').after('<div id="' + index + '_error_' + messageIndex + '" class="invalid-feedback d-block">' + messageText + '</div>')
+                        });
+                    });
                 }
             });
         }
 
+        /**
+         * Show the Highchart here
+         */
         function refreshChart() {
-            console.log("inside refresh chart");
             let fromCurrency = $('#from').val();
             let toCurrency = $('#to').val();
 
@@ -152,67 +163,67 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function (response) {
-                        var seriesData = Object.keys(response.result).map(function (dateKey) {
-                        var date = new Date(dateKey).getTime(); // Convert date string to timestamp
-                        var exchangeRates = Object.values(response.result[dateKey]);
-                        var exchangeRate = exchangeRates[0]; // Assuming there's only one exchange rate per date
-                        return [date, exchangeRate];
-                    });
+                    if (response.result) {
+                        let seriesData = Object.keys(response.result).map(function (dateKey) {
+                            let date = new Date(dateKey).getTime(); // Convert date string to timestamp
+                            let exchangeRates = Object.values(response.result[dateKey]);
+                            let exchangeRate = exchangeRates[0]; // Assuming there's only one exchange rate per date
+                            return [date, exchangeRate];
+                        });
 
-                    console.log(response.result);
+                        let chart = $("#chart");
 
-                    let chart = $("#chart");
+                        if (chart.height() < 450) {
+                            chart.animate({
+                                height: '450px'
+                            }, 1000);
+                        }
 
-                    if (chart.height() < 450) {
-                        chart.animate({
-                            height: '450px'
-                        }, 1000);
-                    }
-
-                    Highcharts.chart('chart', {
-                        chart: {
-                            type: 'spline'
-                        },
-                        title: {
-                            text: fromCurrency + '/' + toCurrency + ' Historical Data for the last 2 months.'
-                        },
-                        xAxis: {
-                            type: 'datetime',
+                        Highcharts.chart('chart', {
+                            chart: {
+                                type: 'spline'
+                            },
                             title: {
-                                text: 'Date'
-                            }
-                        },
-                        yAxis: {
-                            title: {
-                                text: 'Exchange Rate'
-                            }
-                        },
-                        plotOptions: {
-                            series: {
-                                marker: {
-                                    symbol: 'circle',
-                                    fillColor: '#FFFFFF',
-                                    enabled: true,
-                                    radius: 2.5,
-                                    lineWidth: 1,
-                                    lineColor: '#f6452b',
+                                text: fromCurrency + '/' + toCurrency + ' Historical Data for the last 2 months.'
+                            },
+                            xAxis: {
+                                type: 'datetime',
+                                title: {
+                                    text: 'Date'
                                 }
-                            }
-                        },
-                        tooltip: {
-                            formatter: function() {
-                                return 'Date: <strong>' + Highcharts.dateFormat('%d-%m-%Y', this.x) + '</strong><br>' +
-                                    'Exchange rate: <strong>' + this.y.toFixed(5) + '</strong>';
-                            }
-                        },
-                        series: [{
-                            name: fromCurrency + '/' + toCurrency,
-                            color: 'orange',
-                            data: seriesData
-                        }]
-                    });
+                            },
+                            yAxis: {
+                                title: {
+                                    text: 'Exchange Rate'
+                                }
+                            },
+                            plotOptions: {
+                                series: {
+                                    marker: {
+                                        symbol: 'circle',
+                                        fillColor: '#FFFFFF',
+                                        enabled: true,
+                                        radius: 2.5,
+                                        lineWidth: 1,
+                                        lineColor: '#f6452b',
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                formatter: function () {
+                                    return 'Date: <strong>' + Highcharts.dateFormat('%d-%m-%Y', this.x) + '</strong><br>' +
+                                        'Exchange rate: <strong>' + this.y.toFixed(5) + '</strong>';
+                                }
+                            },
+                            series: [{
+                                name: fromCurrency + '/' + toCurrency,
+                                color: 'orange',
+                                data: seriesData
+                            }]
+                        });
 
-                },
+                    }
+                }
             });
 
 
@@ -238,9 +249,9 @@
             });
 
             $('#from').change(function () {
+                $('#from, #to').change(checkDropdowns);
                 let fromAmount = $('#from_amount').val(); //from_amount
                 if (fromAmount) {
-
                     clearTimeout(typingTimer);  // Clear the previous timer
                     typingTimer = setTimeout(function () {
                         newConversion();
@@ -250,6 +261,7 @@
             });
 
             $('#to').change(function () {
+                $('#from, #to').change(checkDropdowns);
                 let toAmount = $('#to_amount').val(); //from_amount
                 if (toAmount) {
                     clearTimeout(typingTimer);  // Clear the previous timer
@@ -345,6 +357,17 @@
                     }
                 });
             });
+
+            function checkDropdowns() {
+                let from = $('#from').val();
+                let to = $('#to').val();
+
+                if (from !== '' && to !== '') {
+                    $('#from_amount').prop('disabled', false);
+                } else {
+                    $('#from_amount').prop('disabled', true);
+                }
+            }
         });
     </script>
 @endpush
