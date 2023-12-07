@@ -225,20 +225,13 @@
                     }
                 }
             });
-
-
         }
 
         $(document).ready(function () {
             let typingTimer; // add timeout to be able to convert only after the user has finished typing.
             const doneTypingInterval = 1000; // 1 second
 
-            $("#btnLeft").on("click", function (e) {
-                e.preventDefault();
-                switchCurrencies();
-            });
-
-            $("#btnRight").on("click", function (e) {
+            $("#btnLeft, #btnRight").on("click", function (e) {
                 e.preventDefault();
                 switchCurrencies();
             });
